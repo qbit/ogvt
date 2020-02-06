@@ -5,18 +5,17 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"strings"
 
 	"golang.org/x/crypto/openpgp"
-	"golang.org/x/sys/unix"
 )
 
-func verify(pubKey, file, sig io.Reader) (*openpgp.Entity, error) {
-	kr, err := openpgp.ReadArmoredKeyRing(pubKey)
-	if err != nil {
-		return nil, err
-	}
-
+func verifyArmored(kr openpgp.KeyRing, file, sig io.Reader) (*openpgp.Entity, error) {
 	return openpgp.CheckArmoredDetachedSignature(kr, file, sig)
+}
+
+func verify(kr openpgp.KeyRing, file, sig io.Reader) (*openpgp.Entity, error) {
+	return openpgp.CheckDetachedSignature(kr, file, sig)
 }
 
 func open(path string) io.Reader {
@@ -35,14 +34,28 @@ func main() {
 	flag.StringVar(&pub, "pub", "", "path to pub file")
 	flag.Parse()
 
-	unix.PledgePromises("stdio tty unveil rpath")
+	pledge("stdio tty unveil rpath")
 
-	unix.Unveil(sig, "r")
-	unix.Unveil(file, "r")
-	unix.Unveil(pub, "r")
-	unix.UnveilBlock()
+	unveil(sig, "r")
+	unveil(file, "r")
+	unveil(pub, "r")
+	unveilBlock()
 
-	ent, err := verify(open(pub), open(file), open(sig))
+	kr, err := openpgp.ReadArmoredKeyRing(open(pub))
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
+	var ent *openpgp.Entity
+
+	switch {
+	case strings.HasSuffix(sig, ".sig"):
+		ent, err = verify(kr, open(file), open(sig))
+	case strings.HasSuffix(sig, ".asc"):
+		ent, err = verifyArmored(kr, open(file), open(sig))
+	}
+
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
