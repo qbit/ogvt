@@ -10,14 +10,6 @@ import (
 	"golang.org/x/crypto/openpgp"
 )
 
-func verifyArmored(kr openpgp.KeyRing, file, sig io.Reader) (*openpgp.Entity, error) {
-	return openpgp.CheckArmoredDetachedSignature(kr, file, sig)
-}
-
-func verify(kr openpgp.KeyRing, file, sig io.Reader) (*openpgp.Entity, error) {
-	return openpgp.CheckDetachedSignature(kr, file, sig)
-}
-
 func open(path string) io.Reader {
 	f, err := os.Open(path)
 	if err != nil {
@@ -51,9 +43,9 @@ func main() {
 
 	switch {
 	case strings.HasSuffix(sig, ".sig"):
-		ent, err = verify(kr, open(file), open(sig))
+		ent, err = openpgp.CheckDetachedSignature(kr, open(file), open(sig))
 	case strings.HasSuffix(sig, ".asc"):
-		ent, err = verifyArmored(kr, open(file), open(sig))
+		ent, err = openpgp.CheckArmoredDetachedSignature(kr, open(file), open(sig))
 	}
 
 	if err != nil {
