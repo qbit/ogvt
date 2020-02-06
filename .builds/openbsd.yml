@@ -1,0 +1,11 @@
+image: openbsd/latest
+packages:
+  - go
+environment:
+  PATH: /bin:/usr/bin/:/usr/local/bin
+sources:
+  - https://git.sr.ht/~qbit/ogvt
+tasks:
+  - test_ogvt: |
+      cd ogvt
+      go build && ./ogvt -file test/uptime.txt -sig test/uptime.txt.asc -pub test/adent.pub
