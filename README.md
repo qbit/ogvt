@@ -2,6 +2,7 @@
 
 A [pledge(2)](https://man.openbsd.org/pledge) and [unveil(2)](https://man.openbsd.org/unvile)'d tool for verifying GnuPG signatures.
 
+[![builds.sr.ht status](https://builds.sr.ht/~qbit/ogvt.svg)](https://builds.sr.ht/~qbit/ogvt?)
 
 ## Success
 ```
