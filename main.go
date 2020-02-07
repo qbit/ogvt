@@ -55,7 +55,7 @@ func main() {
 	}
 
 	for _, id := range ent.Identities {
-		fmt.Printf("%s\n", id.Name)
+		fmt.Printf("%q\n", id.Name)
 	}
 	fmt.Println("Signature OK.")
 }
