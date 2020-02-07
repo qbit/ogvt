@@ -43,6 +43,7 @@ func main() {
 
 	switch {
 	case strings.HasSuffix(sig, ".sig"):
+	case strings.HasSuffix(sig, ".gpg"):
 		ent, err = openpgp.CheckDetachedSignature(kr, open(file), open(sig))
 	case strings.HasSuffix(sig, ".asc"):
 		ent, err = openpgp.CheckArmoredDetachedSignature(kr, open(file), open(sig))
