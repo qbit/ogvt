@@ -42,10 +42,12 @@ func main() {
 	var ent *openpgp.Entity
 
 	switch {
-	case strings.HasSuffix(sig, ".sig"):
-	case strings.HasSuffix(sig, ".gpg"):
+	case strings.HasSuffix(sig, ".sig"), strings.HasSuffix(sig, ".gpg"):
 		ent, err = openpgp.CheckDetachedSignature(kr, open(file), open(sig))
 	case strings.HasSuffix(sig, ".asc"):
+		ent, err = openpgp.CheckArmoredDetachedSignature(kr, open(file), open(sig))
+	default:
+		// Try to open as an armored file if we don't know the extension
 		ent, err = openpgp.CheckArmoredDetachedSignature(kr, open(file), open(sig))
 	}
 
