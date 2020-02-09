@@ -35,7 +35,7 @@ func main() {
 
 	kr, err := openpgp.ReadArmoredKeyRing(open(pub))
 	if err != nil {
-		fmt.Println(err)
+		fmt.Printf("Can't parse public key '%s'\n%s", pub, err)
 		os.Exit(1)
 	}
 
