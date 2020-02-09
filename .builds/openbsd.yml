@@ -8,4 +8,4 @@ sources:
 tasks:
   - test_ogvt: |
       cd ogvt
-      go build && ./ogvt -file test/uptime.txt -sig test/uptime.txt.asc -pub test/adent.pub
+      ./run_test.sh
