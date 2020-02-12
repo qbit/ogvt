@@ -1,4 +1,4 @@
-module git.sr.ht/~qbit/ogvt
+module suah.dev/ogvt
 
 go 1.13
 
