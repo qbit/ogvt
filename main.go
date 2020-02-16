@@ -10,13 +10,16 @@ import (
 	"golang.org/x/crypto/openpgp"
 )
 
-func open(path string) io.Reader {
-	f, err := os.Open(path)
+func errExit(err error) {
 	if err != nil {
+		if err == io.EOF {
+			fmt.Println("invalid signature file")
+			os.Exit(1)
+		}
 		fmt.Println(err)
 		os.Exit(1)
 	}
-	return f
+
 }
 
 func main() {
@@ -33,7 +36,20 @@ func main() {
 	unveil(pub, "r")
 	unveilBlock()
 
-	kr, err := openpgp.ReadArmoredKeyRing(open(pub))
+	fPub, err := os.Open(pub)
+	errExit(err)
+
+	fFile, err := os.Open(file)
+	errExit(err)
+
+	fSig, err := os.Open(sig)
+	errExit(err)
+
+	defer fPub.Close()
+	defer fSig.Close()
+	defer fFile.Close()
+
+	kr, err := openpgp.ReadArmoredKeyRing(fPub)
 	if err != nil {
 		fmt.Printf("Can't parse public key '%s'\n%s", pub, err)
 		os.Exit(1)
@@ -43,18 +59,15 @@ func main() {
 
 	switch {
 	case strings.HasSuffix(sig, ".sig"), strings.HasSuffix(sig, ".gpg"):
-		ent, err = openpgp.CheckDetachedSignature(kr, open(file), open(sig))
+		ent, err = openpgp.CheckDetachedSignature(kr, fFile, fSig)
 	case strings.HasSuffix(sig, ".asc"):
-		ent, err = openpgp.CheckArmoredDetachedSignature(kr, open(file), open(sig))
+		ent, err = openpgp.CheckArmoredDetachedSignature(kr, fFile, fSig)
 	default:
 		// Try to open as an armored file if we don't know the extension
-		ent, err = openpgp.CheckArmoredDetachedSignature(kr, open(file), open(sig))
+		ent, err = openpgp.CheckArmoredDetachedSignature(kr, fFile, fSig)
 	}
 
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
+	errExit(err)
 
 	for _, id := range ent.Identities {
 		fmt.Printf("%q\n", id.Name)
