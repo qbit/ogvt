@@ -14,9 +14,9 @@ func errExit(err error) {
 	if err != nil {
 		if err == io.EOF {
 			fmt.Println("invalid signature file")
-			os.Exit(1)
+		} else {
+			fmt.Println(err)
 		}
-		fmt.Println(err)
 		os.Exit(1)
 	}
 
