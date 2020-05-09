@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"golang.org/x/crypto/openpgp"
+	"suah.dev/protect"
 )
 
 func errExit(err error) {
@@ -19,7 +20,6 @@ func errExit(err error) {
 		}
 		os.Exit(1)
 	}
-
 }
 
 func main() {
@@ -29,12 +29,12 @@ func main() {
 	flag.StringVar(&pub, "pub", "", "path to pub file")
 	flag.Parse()
 
-	pledge("stdio tty unveil rpath")
+	protect.Pledge("stdio tty unveil rpath")
 
-	unveil(sig, "r")
-	unveil(file, "r")
-	unveil(pub, "r")
-	unveilBlock()
+	protect.Unveil(sig, "r")
+	protect.Unveil(file, "r")
+	protect.Unveil(pub, "r")
+	protect.UnveilBlock()
 
 	fPub, err := os.Open(pub)
 	errExit(err)
