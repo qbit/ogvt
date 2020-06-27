@@ -29,12 +29,12 @@ func main() {
 	flag.StringVar(&pub, "pub", "", "path to pub file")
 	flag.Parse()
 
-	protect.Pledge("stdio tty unveil rpath")
+	_ = protect.Pledge("stdio tty unveil rpath")
 
-	protect.Unveil(sig, "r")
-	protect.Unveil(file, "r")
-	protect.Unveil(pub, "r")
-	protect.UnveilBlock()
+	_ = protect.Unveil(sig, "r")
+	_ = protect.Unveil(file, "r")
+	_ = protect.Unveil(pub, "r")
+	_ = protect.UnveilBlock()
 
 	fPub, err := os.Open(pub)
 	errExit(err)
