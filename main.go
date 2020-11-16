@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"golang.org/x/crypto/openpgp"
@@ -35,6 +36,14 @@ func main() {
 	_ = protect.Unveil(file, "r")
 	_ = protect.Unveil(pub, "r")
 	_ = protect.UnveilBlock()
+
+	if sig != "" && file == "" {
+		// Check for a 'file' with the .sig extensions removed
+		bn := strings.TrimSuffix(sig, filepath.Ext(sig))
+		if _, err := os.Stat(bn); err == nil {
+			file = bn
+		}
+	}
 
 	fPub, err := os.Open(pub)
 	errExit(err)
