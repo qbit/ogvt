@@ -16,6 +16,9 @@ printf "Testing detached non-armor (sig)\t"
 printf "Testing just having a sig (nofile)\t"
 ./ogvt -sig test/uptime.txt.sig -pub test/adent.pub >/dev/null && echo "OK" || echo "FAIL"
 
+printf "Testing clearsig file (clear-asc)\t"
+./ogvt -sig test/uptime2.txt.asc -pub test/adent.pub >/dev/null && echo "OK" || echo "FAIL"
+
 printf "Testing bad sig file\t\t\t"
 ./ogvt -file test/uptime.txt -sig test/bad.sig -pub test/adent.pub >/dev/null && echo "FAIL" || echo "OK"
 
