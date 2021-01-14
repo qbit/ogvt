@@ -41,6 +41,11 @@ func main() {
 	flag.StringVar(&flags.pub, "pub", "", "path to pubkey file")
 	flag.Parse()
 
+	if len(os.Args) == 1 {
+		flag.PrintDefaults()
+		os.Exit(1)
+	}
+
 	_ = protect.Unveil(flags.sig, "r")
 	_ = protect.Unveil(flags.file, "r")
 	_ = protect.Unveil(flags.pub, "r")
