@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"text/tabwriter"
 
 	"golang.org/x/crypto/openpgp"
 	"golang.org/x/crypto/openpgp/clearsign"
@@ -66,6 +67,15 @@ func main() {
 		os.Exit(1)
 	}
 
+	if flags.sig == "" && flags.file == "" {
+		for _, ent := range kr {
+			for name := range ent.Identities {
+				fmt.Printf("%q (%X)\n", name, ent.PrimaryKey.Fingerprint)
+			}
+		}
+		return
+	}
+
 	var sig, message io.Reader
 	var clearsigBlock *clearsign.Block
 	var armored bool
@@ -115,8 +125,10 @@ func main() {
 	}
 	errExit(err)
 
+	w := tabwriter.NewWriter(os.Stdout, 0, 0, 1, ' ', 0)
 	for _, id := range ent.Identities {
-		fmt.Printf("%q\n", id.Name)
+		fmt.Fprintf(w, "%q\t(%X)\n", id.Name, ent.PrimaryKey.Fingerprint)
 	}
+	w.Flush()
 	fmt.Println("Signature OK.")
 }
