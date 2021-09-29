@@ -7,7 +7,7 @@ A [pledge(2)](https://man.openbsd.org/pledge) and [unveil(2)](https://man.openbs
 ## Success
 ```
 ./ogvt -file test/uptime.txt  -sig test/uptime.txt.asc -pub test/adent.pub
-Arthur Dent <adent@in.space.time>
+"Arthur Dent <adent@in.space.time>" (85A37DE03BBE9A3019A7E3A43BC546AF2E6705B7)
 Signature OK.
 ```
 
