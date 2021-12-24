@@ -6,12 +6,14 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"log"
 	"os"
 	"path/filepath"
 	"text/tabwriter"
 
-	"golang.org/x/crypto/openpgp"
-	"golang.org/x/crypto/openpgp/clearsign"
+	"github.com/ProtonMail/go-crypto/openpgp"
+	"github.com/ProtonMail/go-crypto/openpgp/clearsign"
+	"github.com/ProtonMail/go-crypto/openpgp/packet"
 	"suah.dev/protect"
 )
 
@@ -60,7 +62,7 @@ func main() {
 
 	pubFi, err := os.Open(flags.pub)
 	errExit(err)
-	defer pubFi.Close()
+
 	kr, err := openpgp.ReadArmoredKeyRing(pubFi)
 	if err != nil {
 		fmt.Printf("Can't parse public key %q\n%s\n", flags.pub, err)
@@ -107,7 +109,6 @@ func main() {
 			os.Exit(1)
 		}
 		errExit(err)
-		defer messageFi.Close()
 
 		message = messageFi
 		sig = bytes.NewReader(sigBytes)
@@ -118,17 +119,22 @@ func main() {
 	}
 
 	var ent *openpgp.Entity
+	var pkt *packet.Config
 	if armored {
-		ent, err = openpgp.CheckArmoredDetachedSignature(kr, message, sig)
+		ent, err = openpgp.CheckArmoredDetachedSignature(kr, message, sig, pkt)
 	} else {
-		ent, err = openpgp.CheckDetachedSignature(kr, message, sig)
+		ent, err = openpgp.CheckDetachedSignature(kr, message, sig, pkt)
 	}
 	errExit(err)
 
 	w := tabwriter.NewWriter(os.Stdout, 0, 0, 1, ' ', 0)
 	for _, id := range ent.Identities {
-		fmt.Fprintf(w, "%q\t(%X)\n", id.Name, ent.PrimaryKey.Fingerprint)
+		_, err := fmt.Fprintf(w, "%q\t(%X)\n", id.Name, ent.PrimaryKey.Fingerprint)
+		if err != nil {
+			log.Println(err)
+		}
 	}
-	w.Flush()
+	err = w.Flush()
+	errExit(err)
 	fmt.Println("Signature OK.")
 }
