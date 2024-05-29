@@ -1,8 +1,8 @@
 {
-  description = "A simple Go package";
+  description = "Simple PGP verification tool";
 
   # Nixpkgs / NixOS version to use.
-  inputs.nixpkgs.url = "nixpkgs/nixos-21.11";
+  inputs.nixpkgs.url = "nixpkgs/nixos-unstable";
 
   outputs = { self, nixpkgs }:
     let
@@ -38,17 +38,7 @@
             # in the Nix store.
             src = ./.;
 
-            # This hash locks the dependencies of this package. It is
-            # necessary because of how Go requires network access to resolve
-            # VCS.  See https://www.tweag.io/blog/2021-03-04-gomod2nix/ for
-            # details. Normally one can build with a fake sha256 and rely on native Go
-            # mechanisms to tell you what the hash should be or determine what
-            # it should be "out-of-band" with other tooling (eg. gomod2nix).
-            # To begin with it is recommended to set this, but one must
-            # remeber to bump this hash when your dependencies change.
-            #vendorSha256 = pkgs.lib.fakeSha256;
-
-            vendorSha256 = "sha256-pQpattmS9VmO3ZIQUFn66az8GSmB4IvYhTTCFn6SUmo=";
+            vendorHash = "sha256-9DlIUS3Q3R/W57N/OV5VbPAsWGVH5zM3ZQVyYECtRsA=";
           };
         });
 
